@@ -1,0 +1,72 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Demo.Server
+-- Copyright   :  (c) 2020 EMQ Technologies Co., Ltd.
+-- License     :  BSD-style (see the LICENSE file)
+--
+-- Maintainer  :  Feng Lee, feng@emqx.io
+--                Yang M, yangm@emqx.io
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- The GenServer Demo.
+--
+-----------------------------------------------------------------------------
+module Demo.Server where
+
+import Prelude
+import Control.Behaviour.GenServer (class GenServer, From, call, cast, startServer, reply, noReply)
+import Control.Behaviour.Application as App
+
+data Message = Inc | Dec | Query
+
+data State = State Integer
+
+-----------------------------------------------------------------------------
+-- | Server API
+-----------------------------------------------------------------------------
+
+inc :: Pid -> Process ()
+inc pid = cast pid Inc
+
+dec :: Pid -> Process ()
+dec pid = cast pid Dec
+
+query :: Pid -> Process Integer
+query pid = call pid Query
+
+-----------------------------------------------------------------------------
+-- | Server callbacks
+-----------------------------------------------------------------------------
+
+instance GenServer Message State where
+  handleCall = handleCall
+  handleCast = handleCast
+
+init :: Integer -> Process State
+init n = pure $ State n
+
+handleCall :: Message -> From -> State -> Process State
+handleCall Query from st = reply from st st
+handleCall _ from st = reply from :badReq st
+
+handleCast :: Message -> State -> Process State
+handleCast Inc (State n) = noReply $ State (n+1)
+handleCast Dec (State n) = noReply $ State (n-1)
+handleCast _ st   = noReply st
+
+-----------------------------------------------------------------------------
+-- | main
+-----------------------------------------------------------------------------
+
+main :: IO Integer
+main = do
+  App.ensureStarted :sasl
+  pid <- startServer init 10
+  inc pid
+  inc pid
+  inc pid
+  cast pid "Hello GenServer"
+  reply <- query pid
+  pure reply
+
