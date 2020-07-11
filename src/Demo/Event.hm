@@ -41,7 +41,7 @@ handleEvent e (State events) = do
 main :: IO ()
 main = do
   ensureStarted :sasl
-  pid <- start init 10
+  pid <- start $  init 10
   notifyTo pid EventA
   notifyTo pid EventB
   notifyTo pid EventA
