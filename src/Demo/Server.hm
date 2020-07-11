@@ -19,16 +19,16 @@ import Control.Behaviour.GenServer
   ( class GenServer
   , HandleCall
   , HandleCast
-  , InitResult(..)
+  , InitHandler
   , ServerAction(..)
-  , StartRet(..)
+  , initOk
   , callTo
   , castTo
   , noReply
   , reply
   , start
   )
-import Kernel.Application as App
+import Control.Application (ensureStarted)
 import System.IO (println)
 
 data Request = Inc | Dec | Query
@@ -60,14 +60,14 @@ instance GenServer Request Reply State where
   handleCall = handleCall
   handleCast = handleCast
 
-init :: Integer -> Process (InitResult State)
-init n = return $ InitOk (State n)
+init :: InitHandler Integer State
+init n = return $ initOk (State n)
 
 handleCall :: HandleCall Request Reply State
 handleCall Query (State i) = do
   println "Call: Query"
   reply (QueryResult i) (State i)
-handleCall _ st = return $ ServerIgnore st
+handleCall _ st = return $ ServerIgnore st -- TODO:
 
 handleCast :: HandleCast Request State
 handleCast Inc (State n) = do
@@ -84,15 +84,8 @@ handleCast _ st = noReply st
 
 main :: IO Integer
 main = do
-  App.ensureStarted :sasl
-  ret <- start init 10
-  case ret of
-    StartOk pid ->
-      doSomething pid
-    _ -> error "Failed to start GenServer"
-
-doSomething :: Pid -> IO Integer
-doSomething pid = do
+  ensureStarted :sasl
+  pid <- start init 10
   inc pid
   inc pid
   inc pid

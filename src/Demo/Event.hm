@@ -19,11 +19,10 @@ import Control.Behaviour.GenEvent
   ( class GenEvent
   , InitResult(..)
   , HandleEvent
-  , StartRet(..)
   , notifyTo
   , start
   )
-import Kernel.Application (ensureStarted)
+import Control.Application (ensureStarted)
 
 data Event = EventA | EventB
 data State = State [Event]
@@ -42,12 +41,9 @@ handleEvent e (State events) = do
 main :: IO ()
 main = do
   ensureStarted :sasl
-  ret <- start init 10
-  case ret of
-    StartOk pid -> do
-      notifyTo pid EventA
-      notifyTo pid EventB
-      notifyTo pid EventA
-      notifyTo pid EventB
-    _ -> error "Failed to start GenEvent"
+  pid <- start init 10
+  notifyTo pid EventA
+  notifyTo pid EventB
+  notifyTo pid EventA
+  notifyTo pid EventB
 

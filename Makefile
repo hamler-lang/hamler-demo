@@ -7,3 +7,6 @@ build:
 
 run:
 	@hamler run
+
+repl:
+	@hamler repl
