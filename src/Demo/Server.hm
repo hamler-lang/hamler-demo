@@ -60,7 +60,7 @@ instance GenServer Request Reply State where
   handleCall = handleCall
   handleCast = handleCast
 
-init :: InitHandler Integer State
+init :: Integer -> InitHandler State
 init n = return $ initOk (State n)
 
 handleCall :: HandleCall Request Reply State
@@ -85,7 +85,7 @@ handleCast _ st = noReply st
 main :: IO Integer
 main = do
   ensureStarted :sasl
-  pid <- start init 10
+  pid <- start $ init 10
   inc pid
   inc pid
   inc pid
