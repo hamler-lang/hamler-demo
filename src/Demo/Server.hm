@@ -12,23 +12,22 @@
 -- The GenServer Demo.
 --
 -----------------------------------------------------------------------------
-module Demo.Server where
+module Demo.Server (startServer, inc, dec, query, main) where
 
 import Prelude
 import Control.Behaviour.GenServer
   ( class GenServer
   , HandleCall
   , HandleCast
-  , InitHandler
+  , Init
   , ServerAction(..)
   , initOk
   , callTo
   , castTo
   , noReply
   , reply
-  , start
+  , startLinkWith
   )
-import Control.Application (ensureStarted)
 import System.IO (println)
 
 data Request = Inc | Dec | Query
@@ -36,6 +35,9 @@ data Request = Inc | Dec | Query
 data Reply = QueryResult Integer
 
 data State = State Integer
+
+startServer :: Process Pid
+startServer = startLinkWith "Demo.Server" (init 20)
 
 -----------------------------------------------------------------------------
 -- | Server API
@@ -60,7 +62,7 @@ instance GenServer Request Reply State where
   handleCall = handleCall
   handleCast = handleCast
 
-init :: InitHandler Integer State
+init :: Integer -> Init State
 init n = return $ initOk (State n)
 
 handleCall :: HandleCall Request Reply State
@@ -82,14 +84,13 @@ handleCast _ st = noReply st
 -- | main
 -----------------------------------------------------------------------------
 
-main :: IO Integer
+main :: IO ()
 main = do
-  ensureStarted :sasl
-  pid <- start init 10
+  pid <- startServer
   inc pid
   inc pid
   inc pid
   dec pid
   reply <- query pid
-  return reply
+  printf "%d" reply
 

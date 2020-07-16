@@ -1,0 +1,26 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Demo.App
+-- Copyright   :  (c) 2020 EMQ Technologies Co., Ltd.
+-- License     :  BSD-style (see the LICENSE file)
+--
+-- Maintainer  :  Feng Lee, feng@emqx.io
+--                Yang M, yangm@emqx.io
+-- Stability   :  experimental
+-- Portability :  portable
+--
+-- The Demo Application.
+--
+-----------------------------------------------------------------------------
+module Demo.App (onStart, onStop) where
+
+import Prelude
+import Demo.Sup as Sup
+
+onStart :: Process Pid
+onStart = do
+  println "onStart called!"
+  Sup.start
+
+onStop :: Process ()
+onStop = println "onStop called!"

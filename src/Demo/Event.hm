@@ -12,17 +12,20 @@
 -- The GenEvent Demo.
 --
 -----------------------------------------------------------------------------
-module Demo.Event where
+module Demo.Event (startEventMgr, main) where
 
 import Prelude
 import Control.Behaviour.GenEvent
   ( class GenEvent
-  , InitResult(..)
+  , Init
+  , initOk
   , HandleEvent
   , notifyTo
-  , start
+  , startLinkWith
   )
-import Control.Application (ensureStarted)
+
+startEventMgr :: Process Pid
+startEventMgr = startLinkWith "Demo.Event" init
 
 data Event = EventA | EventB
 data State = State [Event]
@@ -30,8 +33,8 @@ data State = State [Event]
 instance GenEvent Event State where
   handleEvent = handleEvent
 
-init :: Integer -> Process (InitResult State)
-init _ = return $ InitOk (State [])
+init :: Init State
+init = return $ initOk (State [])
 
 handleEvent :: HandleEvent Event State
 handleEvent e (State events) = do
@@ -40,10 +43,8 @@ handleEvent e (State events) = do
 
 main :: IO ()
 main = do
-  ensureStarted :sasl
-  pid <- start init 10
+  pid <- startEventMgr
   notifyTo pid EventA
   notifyTo pid EventB
   notifyTo pid EventA
   notifyTo pid EventB
-
