@@ -25,7 +25,7 @@ import Control.Behaviour.GenEvent
   )
 
 startEventMgr :: Process Pid
-startEventMgr = startLinkWith :demoEvent init
+startEventMgr = startLinkWith :"Demo.Event" init
 
 data Event = EventA | EventB
 data State = State [Event]

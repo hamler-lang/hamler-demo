@@ -37,7 +37,7 @@ data Reply = QueryResult Integer
 data State = State Integer
 
 startServer :: Process Pid
-startServer = startLinkWith :demoServer (init 20)
+startServer = startLinkWith :"Demo.Server" (init 20)
 
 -----------------------------------------------------------------------------
 -- | Server API

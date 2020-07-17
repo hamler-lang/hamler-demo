@@ -4,4 +4,4 @@ import Prelude
 import Control.Application as App
 
 main :: IO ()
-main = App.start $ atom("Demo")
+main = App.start $ :"Demo"
