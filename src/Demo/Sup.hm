@@ -25,7 +25,7 @@ import Control.Behaviour.Supervisor
   )
 
 start :: Process Pid
-start = startSupWith "Demo.Sup" init
+start = startSupWith :demoSup init
 
 init :: IO Supervisor
 init = return $ Supervisor OneForAll
