@@ -12,15 +12,15 @@
 -- The Demo Application.
 --
 -----------------------------------------------------------------------------
-module Demo.App (onStart, onStop) where
+module Demo.App (start, stop) where
 
 import Prelude
 import Demo.Sup as Sup
 
-onStart :: Process Pid
-onStart = do
-  println "onStart called!"
+start :: Process Pid
+start = do
+  println "Demo.App started!"
   Sup.start
 
-onStop :: Process ()
-onStop = println "onStop called!"
+stop :: Process ()
+stop = println "Demo.App stopped!"
