@@ -39,10 +39,9 @@ init :: Init State Data
 init = return $ initOk Off (Data 0)
 
 handleEvent :: HandleEvent Event State Data
-{- TODO: fixme later
-handleEvent (Call from) Push Off (Data i) = do
+handleEvent (Call from) Push Off d = do
   replyTo from On
-  return $ next On (Data i+1)
+  return $ next On (inc d)
 
 handleEvent (Call from) Push On d = do
   replyTo from Off
@@ -50,8 +49,9 @@ handleEvent (Call from) Push On d = do
 
 handleEvent (Call from) GetCount s d@(Data i) = do
   replyTo from i
-  return $ keep s d
--}
+  return $ keep d
 
-handleEvent = unhandled
+handleEvent t e s d = unhandled t e s d
 
+inc :: Data -> Data
+inc (Data i) = Data (i+1)
