@@ -12,7 +12,7 @@
 -- The GenServer Demo.
 --
 -----------------------------------------------------------------------------
-module Demo.Server (startServer, inc, dec, query, main) where
+module Demo.Server (start, inc, dec, query, main) where
 
 import Prelude
 import Control.Behaviour.GenServer
@@ -36,8 +36,11 @@ data Reply = QueryResult Integer
 
 data State = State Integer
 
-startServer :: Process Pid
-startServer = startLinkWith :"Demo.Server" (init 20)
+name :: Atom
+name = :server
+
+start :: Process Pid
+start = startLinkWith name (init 20)
 
 -----------------------------------------------------------------------------
 -- | Server API
@@ -86,7 +89,7 @@ handleCast _ st = noReply st
 
 main :: IO ()
 main = do
-  pid <- startServer
+  pid <- start
   inc pid
   inc pid
   inc pid

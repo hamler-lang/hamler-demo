@@ -15,8 +15,8 @@
 module Demo.Sup (start) where
 
 import Prelude
-import Demo.Event (startEventMgr)
-import Demo.Server (startServer)
+import Demo.Event as Event
+import Demo.Server as Server
 import Control.Behaviour.Supervisor
   ( RestartStrategy(..)
   , Supervisor(..)
@@ -24,11 +24,14 @@ import Control.Behaviour.Supervisor
   , startSupWith
   )
 
+name :: Atom
+name = :sup
+
 start :: Process Pid
-start = startSupWith :"Demo.Sup" init
+start = startSupWith name init
 
 init :: IO Supervisor
 init = return $ Supervisor OneForAll
-  [ newChildSpec "Demo.Event" startEventMgr
-  , newChildSpec "Demo.Server" startServer
+  [ newChildSpec "Demo.Event" Event.start
+  , newChildSpec "Demo.Server" Server.start
   ]
