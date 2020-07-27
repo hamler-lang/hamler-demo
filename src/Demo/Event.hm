@@ -37,7 +37,7 @@ start :: Process Pid
 start = startLinkWith name init
 
 init :: Init State
-init = return $ initOk (State [])
+init = initOk (State [])
 
 handleEvent :: HandleEvent Event State
 handleEvent e (State events) = do

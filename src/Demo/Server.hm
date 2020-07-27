@@ -20,13 +20,13 @@ import Control.Behaviour.GenServer
   , HandleCall
   , HandleCast
   , Init
-  , ServerAction(..)
+  , startLinkWith
   , initOk
-  , callTo
-  , castTo
+  , call
+  , cast
   , noReply
   , reply
-  , startLinkWith
+  , shutdown
   )
 import System.IO (println)
 
@@ -46,15 +46,15 @@ start = startLinkWith name (init 20)
 -- | Server API
 -----------------------------------------------------------------------------
 
-inc :: Pid -> Process ()
-inc pid = castTo pid Inc
+inc :: Process ()
+inc = cast name Inc
 
-dec :: Pid -> Process ()
-dec pid = castTo pid Dec
+dec :: Process ()
+dec = cast name Dec
 
-query :: Pid -> Process Integer
-query pid = do
-  QueryResult i <- callTo pid Query
+query :: Process Integer
+query = do
+  QueryResult i <- call name Query
   return i
 
 -----------------------------------------------------------------------------
@@ -65,16 +65,17 @@ instance GenServer Request Reply State where
   handleCall = handleCall
   handleCast = handleCast
 
-init :: Integer -> Init State
-init n = return $ initOk (State n)
+init :: Integer -> Init Request State
+init n = initOk (State n)
 
 handleCall :: HandleCall Request Reply State
-handleCall Query (State i) = do
+handleCall Query _from (State i) = do
   println "Call: Query"
   reply (QueryResult i) (State i)
-handleCall _ st = return $ ServerIgnore st -- TODO:
+handleCall _req _from st =
+  shutdown :badRequest st
 
-handleCast :: HandleCast Request State
+handleCast :: HandleCast Request Reply State
 handleCast Inc (State n) = do
   println "Cast: Inc"
   noReply $ State (n+1)
@@ -89,11 +90,10 @@ handleCast _ st = noReply st
 
 main :: IO ()
 main = do
-  pid <- start
-  inc pid
-  inc pid
-  inc pid
-  dec pid
-  reply <- query pid
+  start
+  inc
+  inc
+  dec
+  reply <- query
   printf "%d" reply
 
