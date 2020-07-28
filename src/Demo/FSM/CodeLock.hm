@@ -88,7 +88,7 @@ locked Cast (Button n) (Data d) =
    in if buttons == d.code then
         let actions = [StateTimeout 1000 Lock] in
             FSM.nextWith Opened (Data d{buttons = []}) actions
-      else FSM.next Locked (Data d{buttons = buttons})
+      else FSM.keep (Data d{buttons = buttons})
 
 locked (Call from) Read d = do
   replyTo from (info Locked d)
