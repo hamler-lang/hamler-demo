@@ -42,7 +42,7 @@ init = initOk (State [])
 handleEvent :: HandleEvent Event State
 handleEvent e (State events) = do
   println "Event"
-  return $ State [e|events]
+  pure $ State [e|events]
 
 main :: IO ()
 main = do

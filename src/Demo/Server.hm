@@ -55,7 +55,7 @@ dec = cast name Dec
 query :: Process Integer
 query = do
   QueryResult i <- call name Query
-  return i
+  pure i
 
 -----------------------------------------------------------------------------
 -- | Server callbacks
